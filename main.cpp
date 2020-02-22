@@ -390,7 +390,7 @@ Scene *initLinkScene()
 {
   Scene *scene = initScene();
   setCamera(scene, point3(1.5,1,1.5), vec3(0,0,0), vec3(0,3,0), 60, float(WIDTH) / float(HEIGHT));
-  setSkyColor(scene, color3(0xc0 / 255.f, 0x39 / 255.f, 0x2b / 255.f));
+  setSkyColor(scene, color3(0.2, 0.2, 0.7));
 
   addLight(scene, initLight(point3(0,10,5), .5f * color3(5, 5, 5)));
   addLight(scene, initLight(point3(3,2,5), .5f * color3(5, 5, 5)));
