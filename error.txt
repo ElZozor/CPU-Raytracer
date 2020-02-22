@@ -1,0 +1,6 @@
+g++ -c -Wall -std=c++14 -g -I./glm-master/ -fopenmp -I./lodepng-master/ -O3 -MT raytracer.o -MMD -MF .d/raytracer.Td raytracer.cpp -o raytracer.o
+mv -f .d/raytracer.Td .d/raytracer.d && touch raytracer.o
+g++ -c -Wall -std=c++14 -g -I./glm-master/ -fopenmp -I./lodepng-master/ -O3 -MT kdtree.o -MMD -MF .d/kdtree.Td kdtree.cpp -o kdtree.o
+mv -f .d/kdtree.Td .d/kdtree.d && touch kdtree.o
+g++ -c -Wall -std=c++14 -g -I./glm-master/ -fopenmp -I./lodepng-master/ -O3 -MT lodepng-master/lodepng.o -MMD -MF .d/lodepng.Td ./lodepng-master/lodepng.cpp -o ./lodepng-master/lodepng.o
+Makefile:30: recipe for target 'lodepng-master/lodepng.o' failed
