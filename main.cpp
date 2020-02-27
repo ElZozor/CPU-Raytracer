@@ -7,9 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ObjLoader.hpp"
+#include "color_msg.h"
+#include "SplittableString.hpp"
 
 #include <sstream>
 #include <set>
+#include <fstream>
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -421,19 +424,119 @@ Scene *initLinkScene()
   return scene;
 }
 
+
+
+Scene *initScene9()
+{
+  
+  Scene *scene = initScene();
+  setCamera(scene, point3(3, 3, 0), vec3(0, 0, 0), vec3(0, 1, 0), 60,
+            float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
+  setSkyColor(scene, color3(0.2, 0.2, 0.7));
+
+  addLight(scene, initLight(point3(2.8, -28.34, 4.33), .5f * color3(0xc0/255.f, 0x39 / 255.f, 0x2b / 255.f)));
+  addLight(scene, initLight(point3(3, 3, 3), .5f * color3(5, 5, 5)));
+
+  Material mat = {1.0771, 0.0589, {0.26, 0.036, 0.014}, {1.0, 0.852, 1.172}};
+  addObject(scene, initCone(point3(0,1,0), vec3(0, 0.5f, 0), 10.f, mat));
+  // mat.diffuseColor = color3(0.014, 0.012, 0.012);
+  // mat.specularColor = color3(0.7, 0.882, 0.786);
+  // mat.IOR = 3;
+  // mat.roughness = 0.00181;
+  addObject(scene, initPlane(vec3(0,1,0), 0, mat));
+  addObject(scene, initSphere(vec3(2, 0.5, 0), 1, mat));
+
+  return scene;
+}
+
+
+vec3 getVector(SplittableString& a)
+{
+  vec3 v;
+  int i = 0;
+  for (auto& p: a.split(","))
+  {
+    v[i ++] = std::stof(p.c_str());
+  }
+
+  return v;
+}
+
+// Scene* initCustomScene(const std::string& filename)
+// {
+//   std::ifstream file(filename);
+//   if (!file.is_open())
+//   {
+//     logc(LIGHT_RED, stderr, "Invalid file: %s", filename.c_str());
+//     exit(2);
+//   }
+
+//   Scene* scene = initScene();
+//   SplittableString str;
+//   while (std::getline(file, str))
+//   {
+//     std::vector<SplittableString> ops = str.split(" ");
+
+//     if (ops.size() < 2 || ops[0] == "#")
+//     {
+//       continue;
+//     }
+
+//     const SplittableString& id = ops[0];
+//     if (id == "camera")
+//     {
+//       if (ops.size() < 5)
+//       {
+//         logc(LIGHT_RED, stderr, "camera, missing parameters");
+//         exit(1);
+//       }
+
+//       point3 position = getVector(ops[1]); 
+//       point3 at = getVector(ops[2]);
+//       point3 up = getVector(ops[3]);
+//       int fov = std::stoi(ops[4].c_str());
+      
+//       setCamera(scene, position, at, up, fov,
+//             float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
+//     }
+//     else if (id == "skycolor")
+//     {
+//       if (ops.size() < 3)
+//       {
+//         logc(LIGHT_RED, stderr, "ligth, missing parameter");
+//         exit(2);
+//       }
+
+//       color3 position = getVector(ops[1]);
+//       color3 color    = getVector(ops[2]);
+
+//       addLight(scene, initLight(position, color));
+//     }
+//     else if (id == "object")
+//     {
+
+//     }
+//   }
+
+//   file.close();
+//   return scene;
+// }
+
+
+
 void displayHelp(char** argv)
 {
-  printf("usage : %s filename scenenumber [options]\n", argv[0]);
-  printf(" - filename         : where to save the result, without extention\n");
-  printf(" - scenenumber      : scene number, optional (default 0)\n");
-  printf("\nAvailable options are:\n");
-  printf(" - width=integer    : size of the resulting image width in pixels   (default 800)\n");
-  printf(" - height=integer   : size of the resulting image height in pixels  (default 600)\n");
-  printf(" - aa=integer       : amount of AA applied to the image             (default 4)\n");
-  printf(" - aamode=string    : optimisation applied to the AA                (default sobel)\n");
-  printf("                      should be one of 'none' | 'luma' | 'sobel'\n");
-  printf(" - focaldist=float  : focal distance from the camera                (defined by the scene)\n");
-  printf(" - focalrange=float : focal range from the focal distance           (defined by the scene)\n");
+  logc(YELLOW, stdout, "usage : %s filename scenenumber [options]\n", argv[0]);
+  logc(YELLOW, stdout,  " - filename         : where to save the result, without extention\n");
+  logc(YELLOW, stdout,  " - scenenumber      : scene number, optional (default 0)\n");
+  logc(YELLOW, stdout,  "\nAvailable options are:\n");
+  logc(YELLOW, stdout,  " - width=integer    : size of the resulting image width in pixels   (default 800)\n");
+  logc(YELLOW, stdout,  " - height=integer   : size of the resulting image height in pixels  (default 600)\n");
+  logc(YELLOW, stdout,  " - aa=integer       : amount of AA applied to the image             (default 4)\n");
+  logc(YELLOW, stdout,  " - aamode=string    : optimisation applied to the AA                (default sobel)\n");
+  logc(YELLOW, stdout,  "                      should be one of 'none' | 'luma' | 'sobel'\n");
+  logc(YELLOW, stdout,  " - focaldist=float  : focal distance from the camera                (defined by the scene)\n");
+  logc(YELLOW, stdout,  " - focalrange=float : focal range from the focal distance           (defined by the scene)\n");
 
   exit(1);
 }
@@ -488,7 +591,7 @@ void parseArguments(int argc, char** argv)
       }
       else
       {
-        printf("Invalid value '%s', must be one of 'none' | 'luma' | 'sobel'\n", value.c_str());
+        logc(LIGHT_RED, stdout,"Invalid value '%s', must be one of 'none' | 'luma' | 'sobel'\n", value.c_str());
         exit(1);
       }
     }
@@ -502,20 +605,21 @@ void parseArguments(int argc, char** argv)
     }
     else
     {
-      printf("Invalid parameter: %s\n", name.c_str());
-      printf("Parameters are: help | width | height | aa | aamode | focaldist | focalrange\n");
-      printf("Type 'help' to display the help message\n");
+      logc(LIGHT_RED, stdout, "Invalid parameter: %s\n", name.c_str());
+      logc(LIGHT_RED, stdout, "Parameters are: help | width | height | aa | aamode | focaldist | focalrange\n");
+      logc(LIGHT_RED, stdout, "Type 'help' to display the help message\n");
       exit(1);
     }
     
   }
 }
 
+#include "omp.h"
 
 
 int main(int argc, char *argv[])
 {
-  printf("Welcome to the L3 IGTAI RayTracer project\n");
+  logc(LIGHT_GREEN, stdout, "Welcome to the L3 IGTAI RayTracer project\n");
   char basename[256];
 
   if (argc < 3)
@@ -562,6 +666,9 @@ int main(int argc, char *argv[])
   case 8:
     scene = initLinkScene();
     break;
+  case 9:
+    scene = initScene9();
+    break;
 
   default:
     scene = initScene0();
@@ -587,15 +694,16 @@ int main(int argc, char *argv[])
 
   printf("render scene %d\n", scene_id);
 
+  double starttime = omp_get_wtime();
   renderImage(img, scene);
+  double endTime = omp_get_wtime();
+  logc(YELLOW, stdout, "Render time: %lfs\n", endTime - starttime);
   freeScene(scene);
-  scene = NULL;
-
+  scene = nullptr;
   printf("save image to %s\n", basename);
   saveImage(img, basename);
   freeImage(img);
-  img = NULL;
-  printf("done. Goodbye\n");
+  img = nullptr;
 
   return 0;
 }

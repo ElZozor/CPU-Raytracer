@@ -43,8 +43,15 @@ typedef struct geometry_s {
             float dist;
         } plane;
         struct {
-          point3 t0, t1, t2;
+          point3  v[3];
+          vec3   vt[3];
+          vec3   vn[3];
         } triangle;
+        struct {
+          point3 C;
+          vec3 V;
+          float teta;
+        } cone;
     };
 } Geometry;
 

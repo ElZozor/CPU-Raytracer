@@ -16,13 +16,14 @@ typedef struct material_s {
   color3 diffuseColor;	//! Base color
 } Material;
 
-enum Etype {SPHERE=1, PLANE, TRIANGLE};
+enum Etype {SPHERE=1, PLANE, TRIANGLE, CONE};
 
 
 //! create a new sphere structure
 Object* initSphere(point3 center, float radius, Material mat);
 Object* initPlane(vec3 normal, float d, Material mat);
-Object *initTriangle(point3 t0, point3 t1, point3 t2, Material mat);
+Object *initTriangle(point3 v[3], point3 vt[3], point3 vn[3], Material mat);
+Object *initCone(point3 C, vec3 V, float teta, Material mat);
 
 //! release memory for the object obj
 void freeObject(Object *obj);

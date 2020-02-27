@@ -8,6 +8,7 @@
 class ObjLoader
 {
 private:
+    std::string mFilename;
     std::vector<Object*> mObjects;
     std::map<std::string, Material> mMaterials;
 
@@ -19,6 +20,7 @@ public:
     std::vector<Object*>& getObjects();
 
 private:
+    void logError(size_t line, const std::string& message);
     void loadMaterialFile(const std::string& filename);
 };
 

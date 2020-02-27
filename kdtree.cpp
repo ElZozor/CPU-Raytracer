@@ -13,7 +13,6 @@
 #define MAX_RECURSION 256
 
 
-
 /**
  * @brief Compute the minimum values for each axis of the vector
  * 
@@ -65,20 +64,39 @@ inline static AABB sphereBounds(const Object* object)
 inline static AABB triangleBounds(const Object* object)
 {
     const auto& triangle = object->geom.triangle;
-    const auto& t0 = triangle.t0;
-    const auto& t1 = triangle.t1;
-    const auto& t2 = triangle.t2;
-    const float minx = min(t0.x, min(t1.x, t2.x));
-    const float maxx = max(t0.x, max(t1.x, t2.x));
-    const float miny = min(t0.y, min(t1.y, t2.y));
-    const float maxy = max(t0.y, max(t1.y, t2.y));
-    const float minz = min(t0.z, min(t1.z, t2.z));
-    const float maxz = max(t0.z, max(t1.z, t2.z));
+    const auto& [v0, v1, v2] = triangle.v;
+    const float minx = min(v0.x, min(v1.x, v2.x));
+    const float maxx = max(v0.x, max(v1.x, v2.x));
+    const float miny = min(v0.y, min(v1.y, v2.y));
+    const float maxy = max(v0.y, max(v1.y, v2.y));
+    const float minz = min(v0.z, min(v1.z, v2.z));
+    const float maxz = max(v0.z, max(v1.z, v2.z));
 
     return {
         vec3(minx, miny, minz),
         vec3(maxx, maxy, maxz)
     };
+}
+
+
+inline static AABB coneBounds(const Object* object)
+{
+    const auto& cone = object->geom.cone;
+    const auto& height = cone.V.y;
+    const auto& radius = height * std::tan(cone.teta);
+
+    printf("height: %f\n", radius);
+
+    const float miny = cone.C.y - height;
+    const float maxy = cone.C.y + height;
+    const float minx = cone.C.x - 2.f*radius;
+    const float maxx = cone.C.x + 2.f*radius;
+    const float minz = cone.C.z - 2.f*radius;
+    const float maxz = cone.C.z + 2.f*radius;
+
+
+
+    return {vec3(minx, miny, minz), vec3(maxx, maxy, maxz)};
 }
 
 
@@ -99,6 +117,9 @@ static AABB objectBounds(const Object* object)
 
         case SPHERE:
             return sphereBounds(object);
+
+        case CONE:
+            return coneBounds(object);
 
         default:
             printf("Object geometry not handled !\n");
@@ -141,6 +162,25 @@ struct KdTreeNode
         objects.reserve(MAX_OBJECT);
     }
 
+
+    /**
+     * @brief Compute the collision between current node and AABB
+     * 
+     * @param aabb
+     * @return true 
+     * @return false 
+     */
+    inline bool intersectsAABB(const AABB& aabb)
+    {
+        return !((bounds.min.x > aabb.max.x)      // trop à droite
+                || (bounds.max.x < aabb.min.x)    // trop à gauche
+                || (bounds.min.y > aabb.max.y)    // trop en bas
+                || (bounds.max.y < aabb.min.y)    // trop en haut
+                || (bounds.min.z > aabb.max.z)    // derrière
+                || (bounds.max.z < aabb.min.z));  // devant
+    }
+
+
     /**
      * @brief Return if the current node intersects a sphere or not
      * 
@@ -167,7 +207,7 @@ struct KdTreeNode
      * @return true 
      * @return false 
      */
-    bool intersectsRay(Ray* ray)
+    inline bool intersectsRay(Ray* ray)
     {
         const auto& [mini, maxi, orig, dir] = std::make_tuple(bounds.min, bounds.max, ray->orig, ray->dir);
         float t[8];
@@ -191,15 +231,22 @@ struct KdTreeNode
      * @return true 
      * @return false 
      */
-    bool intersectsTriangle(const Object* object)
+    inline bool intersectsTriangle(const Object* object)
     {
-        const AABB tb = triangleBounds(object);
-        return !((bounds.min.x > tb.max.x)      // trop à droite
-                || (bounds.max.x < tb.min.x)    // trop à gauche
-                || (bounds.min.y > tb.max.y)    // trop en bas
-                || (bounds.max.y < tb.min.y)    // trop en haut
-                || (bounds.min.z > tb.max.z)    // derrière
-                || (bounds.max.z < tb.min.z));  // devant
+        return intersectsAABB(triangleBounds(object));
+    }
+
+
+    /**
+     * @brief Return whether or not the current node intersects this cone
+     * 
+     * @param object    The cone
+     * @return true 
+     * @return false 
+     */
+    inline bool intersectsCone(const Object* object)
+    {
+        return intersectsAABB(coneBounds(object));
     }
 
 
@@ -218,29 +265,19 @@ struct KdTreeNode
         switch (object->geom.type)
         {
             case TRIANGLE : 
-                if (intersectsTriangle(object))
-                {
-                    result = true;
-                }
-                else
-                {
-                    result = false;
-                }
+                result = intersectsTriangle(object);
                 break;
 
             case SPHERE:
             {
                 const auto& sphere = object->geom.sphere;
-                if (intersectsSphere(sphere.center, sphere.radius))
-                {
-                    result = true;
-                }
-                else
-                {
-                    result = false;
-                }
+                result = intersectsSphere(sphere.center, sphere.radius);
                 break;
             }
+
+            case CONE:
+                result = intersectsCone(object);
+                break;
 
             default :
                 printf("Unhandled object insertion \n");
@@ -251,6 +288,20 @@ struct KdTreeNode
         return result;
     }
 
+
+
+    inline std::tuple<float, float, float> computeRayTs(Ray* ray) 
+    {
+        const auto& [dmin, dmax, dO, dD] = std::make_tuple(
+            bounds.min[dim], bounds.max[dim], ray->orig[dim], ray->dir[dim]
+        );
+        
+        return std::make_tuple(
+            (dmin - dO) / dD,
+            (splitPoint - dO) / dD,
+            (dmax - dO) / dD
+        );
+    }
 
 
     /**
@@ -283,8 +334,14 @@ struct KdTreeNode
                         case TRIANGLE :
                             result = intersectTriangle(ray, intersection, object) || result;
                             break;
+                        
+                        case CONE:
+                            result = intersectCone(ray, intersection, object) || result;
+                            break;
 
-                        default: break;
+                        default: 
+                            printf("Unhandled ray/object intersection !\n");
+                            exit(3);
                     }
                 }
 
@@ -293,6 +350,8 @@ struct KdTreeNode
             else
             {
                 // assert(left->intersectsRay(ray) || right->intersectsRay(ray));
+                
+
                 bool result = left->computeRayIntersections(ray, intersection);
                 result = right->computeRayIntersections(ray, intersection) || result;
                 
@@ -327,7 +386,7 @@ struct KdTreeNode
                 {
                     switch (object->geom.type)
                     {
-                        case SPHERE:
+                        case SPHERE :
                             result = intersectSphere(ray, intersection, object) || result;
                             break;
 
@@ -337,6 +396,10 @@ struct KdTreeNode
 
                         case TRIANGLE :
                             result = intersectTriangle(ray, intersection, object) || result;
+                            break;
+                        
+                        case CONE :
+                            result = intersectCone(ray, intersection, object) || result;
                             break;
 
                         default: break;
@@ -537,6 +600,10 @@ struct s_kdtree
                 case TRIANGLE: 
                     bounds = triangleBounds(object);
                     break;
+                
+                case CONE :
+                    bounds = coneBounds(object);
+                    break;
 
                 default:
                     printf("KD-TREE: unknow object type !\n %d", object->geom.type);
@@ -581,6 +648,10 @@ struct s_kdtree
                     break;
                 
                 case TRIANGLE:
+                    root->insert(object);
+                    break;
+                
+                case CONE:
                     root->insert(object);
                     break;
                 

@@ -22,20 +22,39 @@ Object *initPlane(vec3 normal, float d, Material mat) {
     memcpy(&(ret->mat), &mat, sizeof(Material));
     return ret;
 }
-
-Object *initTriangle(point3 t0, point3 t1, point3 t2, Material mat) {
+#include "stdio.h"
+Object *initTriangle(point3 v[3], vec3 vt[3], vec3 vn[3], Material mat) {
     Object *ret;
     
     ret = (Object *)malloc(sizeof(Object));
     ret->geom.type = TRIANGLE;
-    ret->geom.triangle.t0 = t0;
-    ret->geom.triangle.t1 = t1;
-    ret->geom.triangle.t2 = t2;
-    
-    ret->mat = mat;
+
+    memcpy(ret->geom.triangle.v,  v,  sizeof(point3) * 3);
+    memcpy(ret->geom.triangle.vt, vt, sizeof(vec3)   * 3);
+    memcpy(ret->geom.triangle.vn, vn, sizeof(vec3)   * 3);
+    memcpy(&(ret->mat), &mat, sizeof(Material));
+
+    assert(v[0].x == ret->geom.triangle.v[0].x);
+    printf("%f %f %f \n",v[0].x, v[1].x, v[2].x);
+    // printf("%f %f %f \n",ret->geom.triangle.v[0], ret->geom.triangle.v[1], ret->geom.triangle.v[2]);
 
     return ret;
 }
+
+
+Object *initCone(point3 C, vec3 V, float teta, Material mat) {
+    Object *ret;
+    ret = (Object *)malloc(sizeof(Object));
+    ret->geom.type = CONE;
+    ret->geom.cone.C = C;
+    ret->geom.cone.V = V;
+    ret->geom.cone.teta = teta;
+
+    memcpy(&(ret->mat), &mat, sizeof(Material));
+
+    return ret;
+}
+
 
 void freeObject(Object *obj) {
     free(obj);
