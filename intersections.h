@@ -71,13 +71,13 @@ inline bool intersectTriangle(Ray *ray, Intersection *intersection, Object *obj)
     const auto& [width, height] = std::make_tuple(obj->mat.width, obj->mat.height);
     intersection->textured = (width * height != 0);
 
-    
+
     if (intersection->textured)
     {
         const auto& [t0, t1, t2] = triangle.vt;
         const float w = 1.f - u - v;
         const auto uv = (t0*w + t1*u + t2*v)/(u + v + w);
-        
+
         intersection->vt = uv;
     }
 
@@ -248,23 +248,23 @@ inline bool intersectCone(Ray* ray, Intersection* intersection, Object* object)
     const float A = pos.x - center.x;
     const float B = pos.z - center.z;
     const float D = height - pos.y + center.y;
-    
+
     const float tan = (radius / height) * (radius / height);
-    
+
     const float a = (dir.x * dir.x) + (dir.z * dir.z) - (tan*(dir.y * dir.y));
     const float b = (2*A*dir.x) + (2*B*dir.z) + (2*tan*D*dir.y);
     const float c = (A*A) + (B*B) - (tan*(D*D));
-    
+
     const float delta = b*b - 4*(a*c);
-	if(fabs(delta) < 0.001 || delta < 0.f)
+	  if(fabs(delta) < 0.001 || delta < 0.f)
     {
         return false;
     }
-    
+
     float t1 = (-b - sqrt(delta))/(2*a);
     float t2 = (-b + sqrt(delta))/(2*a);
     float t;
-    
+
     if (t1 < t2)
     {
         t = t1;
@@ -287,7 +287,7 @@ inline bool intersectCone(Ray* ray, Intersection* intersection, Object* object)
         }
     }
 
-    if (t > ray->tmax || t < ray->tmin) 
+    if (t > ray->tmax || t < ray->tmin)
     {
         return false;
     }
@@ -297,9 +297,7 @@ inline bool intersectCone(Ray* ray, Intersection* intersection, Object* object)
     {
         return false;
     } 
-    
-    float r = pos.y + t*dir.y;
-    
+
 
     ray->tmax = t;
     intersection->position = P;
@@ -317,12 +315,12 @@ inline bool intersectCone(Ray* ray, Intersection* intersection, Object* object)
 //     const auto& [O, D] = std::make_pair(ray->orig, ray->dir);
 //     const auto& C = cone.C, V = cone.V;
 //     const auto& teta = cone.teta;
-    
+
 //     const auto DdotV = dot(D,V);
 //     const auto cosT = std::cos(teta);
 //     const auto costTSquared = cosT * cosT;
 //     const auto COdotV = dot(C*O, V);
-    
+
 //     const float a = (DdotV*DdotV) - costTSquared;
 //     const float b = 2.f*(DdotV * COdotV - dot(D, C*O*costTSquared));
 //     const float c = (COdotV * COdotV) - dot((C*O), (C*O*costTSquared));
@@ -377,7 +375,7 @@ inline bool intersectCone(Ray* ray, Intersection* intersection, Object* object)
 
 //     intersection->mat = &object->mat;
 //     intersection->position = ray->orig + (ray->dir * t);
-    
+
 //     ray->tmax = t;
 
 //     return true;

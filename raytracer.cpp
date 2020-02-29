@@ -66,7 +66,7 @@ float RDM_Beckmann(float NdotH, float alpha)
     const float numerateur   = expf((-tanOHSquared) / (alphaSquared));
     const float denominateur = M_PI * alphaSquared * (cosSquared * cosSquared);
 
-    
+
     return RDM_chiplus(NdotH) * (numerateur / denominateur);
 }
 
@@ -183,7 +183,7 @@ color3 shade(vec3 n, vec3 v, vec3 l, color3 lc, Material *mat, const color3& col
     const auto h = normalize(v+l);
     const auto LdotH = dot(l, h), NdotH = dot(n, h),
         VdotH = dot(v, h), LdotN = dot(l, n), VdotN = dot(v, n);
-    
+
     color3 ret = lc * RDM_bsdf(LdotH, NdotH, VdotH, LdotN, VdotN, mat, color) * LdotN;
     return clamp(ret, vec3(0.f), vec3(1.f));
 }
@@ -228,7 +228,7 @@ color3 trace_ray(Scene *scene, Ray *ray, KdTree *tree)
 
     const auto reflectionDir = reflect(ray->dir, intersection.normal);
     const int add = max(1, 10 - int(intersection.mat->IOR * 10));
-    
+
     Ray reflectionRay;
     rayInit(&reflectionRay, intersection.position + (reflectionDir * 0.001f), reflectionDir, acne_eps, 100000.f, ray->depth + add);
 
@@ -240,34 +240,34 @@ color3 trace_ray(Scene *scene, Ray *ray, KdTree *tree)
 
 
 // /*
-//    _____                           _                       _             
-//   / ____|                         | |                     (_)            
-//  | (___  _   _ _ __   ___ _ __ ___| | __ _ _ __ ___  _ __  _ _ __   __ _ 
+//    _____                           _                       _
+//   / ____|                         | |                     (_)
+//  | (___  _   _ _ __   ___ _ __ ___| | __ _ _ __ ___  _ __  _ _ __   __ _
 //   \___ \| | | | '_ \ / _ \ '__/ __| |/ _` | '_ ` _ \| '_ \| | '_ \ / _` |
 //   ____) | |_| | |_) |  __/ |  \__ \ | (_| | | | | | | |_) | | | | | (_| |
 //  |_____/ \__,_| .__/ \___|_|  |___/_|\__,_|_| |_| |_| .__/|_|_| |_|\__, |
 //               | |                                   | |             __/ |
-//               |_|                                   |_|            |___/ 
+//               |_|                                   |_|            |___/
 
 // */
 
 /**
  * @brief Naïve version of AA.
- * 
+ *
  * @param scene         The scene to render
  * @param tree          The kdtree to compute code
- * @param ray_delta_x   
- * @param ray_delta_y 
- * @param x 
- * @param y 
- * @param dx 
- * @param dy 
- * @param amount 
- * @return color3 
+ * @param ray_delta_x
+ * @param ray_delta_y
+ * @param x
+ * @param y
+ * @param dx
+ * @param dy
+ * @param amount
+ * @return color3
  */
-color3 superslamping(Scene* scene, KdTree* tree, const vec3& ray_delta_x, const vec3& ray_delta_y, float x, 
+color3 superslamping(Scene* scene, KdTree* tree, const vec3& ray_delta_x, const vec3& ray_delta_y, float x,
                     float y, const vec3& dx, const vec3& dy) {
-    
+
     const auto AA = SceneParameters::antiAliasing;
     color3 result(0);
     for (int xx = 0; xx < AA; ++xx)
@@ -290,19 +290,19 @@ color3 superslamping(Scene* scene, KdTree* tree, const vec3& ray_delta_x, const 
 
 
 /*
-   _____       _         _ _       _     _             
-  / ____|     | |       | (_)     (_)   (_)            
- | (___  _   _| |__   __| |___   ___ ___ _  ___  _ __  
-  \___ \| | | | '_ \ / _` | \ \ / / / __| |/ _ \| '_ \ 
+   _____       _         _ _       _     _
+  / ____|     | |       | (_)     (_)   (_)
+ | (___  _   _| |__   __| |___   ___ ___ _  ___  _ __
+  \___ \| | | | '_ \ / _` | \ \ / / / __| |/ _ \| '_ \
   ____) | |_| | |_) | (_| | |\ V /| \__ \ | (_) | | | |
  |_____/ \__,_|_.__/ \__,_|_| \_/ |_|___/_|\___/|_| |_|
-                                                       
-*/                                                
+
+*/
 
 
 /**
  * @brief Subdivide a pixel, based on the AA amount specified.
- * 
+ *
  * @param img           The resulting image
  * @param y             The y position of the pixel
  * @param x             The x position of the pixel
@@ -314,7 +314,7 @@ color3 superslamping(Scene* scene, KdTree* tree, const vec3& ray_delta_x, const 
  * @param dy            The dy
  * @return color3       The resulting pixel
  */
-color3 subdividePixel(Image* img, size_t y, size_t x, Scene* scene, KdTree* tree, 
+color3 subdividePixel(Image* img, size_t y, size_t x, Scene* scene, KdTree* tree,
                         const vec3& ray_delta_x, const vec3& ray_delta_y,
                         const vec3& dx, const vec3& dy)
 {
@@ -328,7 +328,7 @@ color3 subdividePixel(Image* img, size_t y, size_t x, Scene* scene, KdTree* tree
     }
 
 
-    // Then we subdivide the pixel into subpixels, 
+    // Then we subdivide the pixel into subpixels,
     // compute the resulting value for each
     // of them and return the average value.
     color3 result(img->data[y * img->width + x]);
@@ -337,7 +337,7 @@ color3 subdividePixel(Image* img, size_t y, size_t x, Scene* scene, KdTree* tree
         for (int yy = 0; yy < AA; ++yy)
         {
             if (xx + yy == 0) continue;
-            
+
             Ray rx;
             vec3 ray_dir = scene->cam.center + ray_delta_x + ray_delta_y +
                 (x + (static_cast<float>(xx) / AA)) * dx + (y + (static_cast<float>(yy) / AA)) * dy;
@@ -354,13 +354,13 @@ color3 subdividePixel(Image* img, size_t y, size_t x, Scene* scene, KdTree* tree
 
 
 /*
-  _                           
- | |                          
- | |    _   _ _ __ ___   __ _ 
+  _
+ | |
+ | |    _   _ _ __ ___   __ _
  | |   | | | | '_ ` _ \ / _` |
  | |___| |_| | | | | | | (_| |
  |______\__,_|_| |_| |_|\__,_|
-                              
+
 */
 
 // Compute the luma value
@@ -382,7 +382,7 @@ color3 subdividePixel(Image* img, size_t y, size_t x, Scene* scene, KdTree* tree
 /**
  * @brief Improve render time when applying AA to the \
  * final render. The AA is only applied to the edges.
- * 
+ *
  * @param img           The resulting image
  * @param y             The y position of the pixel
  * @param x             The x position of the pixel
@@ -394,7 +394,7 @@ color3 subdividePixel(Image* img, size_t y, size_t x, Scene* scene, KdTree* tree
  * @param dy            The dy
  * @return color3       The resulting pixel
  */
-color3 computePixelLumaMethod(Image* img, size_t y, size_t x, Scene* scene, KdTree* tree, 
+color3 computePixelLumaMethod(Image* img, size_t y, size_t x, Scene* scene, KdTree* tree,
                                     const vec3& ray_delta_x, const vec3& ray_delta_y,
                                     const vec3& dx, const vec3& dy)
 {
@@ -415,7 +415,7 @@ color3 computePixelLumaMethod(Image* img, size_t y, size_t x, Scene* scene, KdTr
         maxLuma = std::max(maxLuma, lumaCoeff[i]);
     }
 
-    // Finally we test if we are under a certain 
+    // Finally we test if we are under a certain
     // thresold, in this case we return the pixel color
     // otherwise, we apply the AA.
     const float lumaRange = maxLuma - minLuma + 0.05f;
@@ -432,7 +432,7 @@ color3 computePixelLumaMethod(Image* img, size_t y, size_t x, Scene* scene, KdTr
 /**
  * @brief This function simply iterate through the pixels \
  * call the luma function to compute pixels values.
- * 
+ *
  * @param img            The resulting image
  * @param scene         The scene which contains the objects
  * @param tree          The KDTree used to compute colisions
@@ -443,7 +443,7 @@ color3 computePixelLumaMethod(Image* img, size_t y, size_t x, Scene* scene, KdTr
  */
 void lumaImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree, const vec3& ray_delta_x, const vec3& ray_delta_y,
                         const vec3& dx, const vec3& dy, int amount) {
-    
+
     const size_t height = SceneParameters::imageHeight;
     const size_t width  = SceneParameters::imageWidth;
     std::vector<color3> buffer(height*width);
@@ -464,7 +464,7 @@ void lumaImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree, const vec
 
 
 /*
-   _____       _          _ 
+   _____       _          _
   / ____|     | |        | |
  | (___   ___ | |__   ___| |
   \___ \ / _ \| '_ \ / _ \ |
@@ -476,7 +476,7 @@ void lumaImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree, const vec
 /**
  * @brief Detect the horizontal edges for  \
  * the sobel operator
- * 
+ *
  */
 #define SOBEL_X_VALUE(buffer, y, x) (               \
       buffer[(y - 1) * img->width + (x - 1)]        \
@@ -490,7 +490,7 @@ void lumaImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree, const vec
 /**
  * @brief Detect the vertical edges for  \
  * the sobel operator
- * 
+ *
  */
 #define SOBEL_Y_VALUE(buffer, y, x) (               \
       buffer[(y - 1) * img->width + (x - 1)]        \
@@ -504,7 +504,7 @@ void lumaImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree, const vec
 
 /**
  * @brief Mix both horizontal and vertical values
- * 
+ *
  */
 #define SOBEL_VALUE(img, y, x) (                    \
       abs(SOBEL_X_VALUE(img, y, x))                 \
@@ -513,7 +513,7 @@ void lumaImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree, const vec
 
 /**
  * @brief Transform a pixel into it's greyscale value
- * 
+ *
  */
 #define GREY_SCALE(color) (                         \
       color[0] * 0.07f                              \
@@ -525,7 +525,7 @@ void lumaImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree, const vec
 
 /**
  * @brief Improve the render time by detecting edges for superslamping
- * 
+ *
  * @param img           The resulting image
  * @param scene         The scene which contains the objects
  * @param tree          The KDTree used to compute colisions
@@ -534,7 +534,7 @@ void lumaImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree, const vec
  * @param dx            The dx
  * @param dy            The dy
  */
-void sobelImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree, 
+void sobelImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree,
                         const vec3& ray_delta_x, const vec3& ray_delta_y,
                         const vec3& dx, const vec3& dy)
 {
@@ -579,7 +579,7 @@ void sobelImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree,
 
 /**
  * @brief Compute the heightmap for the gaussian blur
- * 
+ *
  * @param scene         The scene which contains the objects
  * @param tree          The KDTree used to compute colisions
  * @param ray_delta_x   The dx of the ray
@@ -587,8 +587,8 @@ void sobelImprovedSuperslamping(Image* img, Scene* scene, KdTree* tree,
  * @param dx            The dx
  * @param dy            The dy
  */
-void computeHeightMap(Scene* scene, KdTree* tree, const vec3& ray_delta_x, 
-        const vec3& ray_delta_y,const vec3& dx, const vec3& dy) 
+void computeHeightMap(Scene* scene, KdTree* tree, const vec3& ray_delta_x,
+        const vec3& ray_delta_y,const vec3& dx, const vec3& dy)
 {
 
     const size_t width  = SceneParameters::imageWidth;
@@ -628,19 +628,19 @@ void computeHeightMap(Scene* scene, KdTree* tree, const vec3& ray_delta_x,
 
 
 /*
-  ____  _            
- |  _ \| |           
- | |_) | |_   _ _ __ 
+  ____  _
+ |  _ \| |
+ | |_) | |_   _ _ __
  |  _ <| | | | | '__|
- | |_) | | |_| | |   
- |____/|_|\__,_|_|   
-                     
+ | |_) | | |_| | |
+ |____/|_|\__,_|_|
+
 */
 
 
 /**
  * @brief Compute the pascal triangle given line
- * 
+ *
  * @param size                  The desired line
  * @return std::vector<int>     The resulting line
  */
@@ -654,7 +654,7 @@ std::vector<int> pascal(int size)
     const auto p = pascal(size - 1);
     const auto psize = p.size();
     std::vector<int> result({p[0]});
-    for (int i = 0; i < psize - 1; ++i)
+    for (size_t i = 0; i < psize - 1; ++i)
     {
         result.push_back(p[i] + p[i + 1]);
     }
@@ -668,7 +668,7 @@ std::vector<int> pascal(int size)
 /**
  * @brief Approximate the gaussian coeff \
  *  via the pascal triangle
- * 
+ *
  * @param x             The x position of the pixel
  * @param y             The y position of the pixel
  * @param matrixSize    The desired matrix size
@@ -695,7 +695,7 @@ float gaussianCoeff(size_t x, size_t y, int matrixSize)
 
     matrixSize = max(1, matrixSize);
     const auto& p = pascalTriangle[matrixSize - 1];
-    
+
     return float(p[x] * p[y]);
 }
 
@@ -704,7 +704,7 @@ float gaussianCoeff(size_t x, size_t y, int matrixSize)
 /**
  * @brief Apply a gaussian blur to the image based \
  * on a computed heightmap.
- * 
+ *
  * @param img           The resulting image
  * @param scene         The scene which contains the objects
  * @param tree          The KDTree used to compute colisions
@@ -713,7 +713,7 @@ float gaussianCoeff(size_t x, size_t y, int matrixSize)
  * @param dx            The dx
  * @param dy            The dy
  */
-void gaussianblur(Image* img, Scene* scene, KdTree* tree, const vec3& ray_delta_x, 
+void gaussianblur(Image* img, Scene* scene, KdTree* tree, const vec3& ray_delta_x,
         const vec3& ray_delta_y,const vec3& dx, const vec3& dy)
 {
     computeHeightMap(scene, tree, ray_delta_x, ray_delta_y, dx, dy);
@@ -789,7 +789,7 @@ void classicRender(Image* img, Scene* scene)
     for (size_t j = 0; j < img->height; j++)
     {
         if (j > percent)
-        {   
+        {
             if (j != 0)
                 printf("\033[A\r");
             float progress = (float)j / img->height * 100.f;
@@ -802,7 +802,7 @@ void classicRender(Image* img, Scene* scene)
             printf("]\n");
             percent = j + percent_range;
         }
-        
+
 #pragma omp parallel for
         for (size_t i = 0; i < img->width; i++)
         {
@@ -832,7 +832,7 @@ void classicRender(Image* img, Scene* scene)
                                         dx, dy);
         }
     }
-    
+
 
 
     if (SceneParameters::focalDistance > 0)
@@ -865,7 +865,7 @@ void naiveSuperslampingRender(Image* img, Scene* scene)
     for (size_t j = 0; j < img->height; j++)
     {
         if (j > percent)
-        {   
+        {
             if (j != 0)
                 printf("\033[A\r");
             float progress = (float)j / img->height * 100.f;
@@ -878,7 +878,7 @@ void naiveSuperslampingRender(Image* img, Scene* scene)
             printf("]\n");
             percent = j + percent_range;
         }
-        
+
 #pragma omp parallel for
         for (size_t i = 0; i < img->width; i++)
         {
@@ -899,7 +899,7 @@ void naiveSuperslampingRender(Image* img, Scene* scene)
 
 
 void renderImage(Image *img, Scene *scene)
-{    
+{
     if (SceneParameters::AAMode == "none")
     {
         naiveSuperslampingRender(img, scene);

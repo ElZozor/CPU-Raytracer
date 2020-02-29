@@ -299,158 +299,6 @@ Scene *initScene4()
   return scene;
 }
 
-Scene *initScene5()
-{
-  Scene *scene = initScene();
-  setCamera(scene, point3(5, 3, 5), vec3(0, 1, 0), vec3(0, 3, 0), 60,
-            float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
-  setSkyColor(scene, color3(0.2, 0.2, 0.7));
-  Material mat;
-  mat.diffuseColor = color3(0.301, 0.034, 0.039);
-  mat.specularColor = color3(1.0, 0.992, 0.98);
-  mat.IOR = 1.1382;
-  mat.roughness = 0.0886;
-
-  addLight(scene, initLight(point3(5, 3, 3), .5f * color3(5, 5, 5)));
-  addLight(scene, initLight(point3(-6, 3, 3), .5f * color3(5, 5, 5)));
-
-  ObjLoader loader;
-  loader.load("scene5.obj");
-  const std::vector<Object *> &objs = loader.getObjects();
-  printf("%ld triangles loaded, adding them to the scene..\n", objs.size());
-  for (Object *obj : objs)
-  {
-    addObject(scene, obj);
-  }
-
-  addObject(scene, initSphere(point3(-4, 2, 0), 1.f, {2.4449, 0.0681, {1.0, 0.882, 0.786}, {0.014, 0.012, 0.012}}));
-  addObject(scene, initSphere(point3(-2, 2, -2), 1.f, {1.1153, 0.068, {0.012, 0.036, 0.106}, {1.0, 0.965, 1.07}}));
-
-  SceneParameters::focalDistance = -1.f;
-
-  return scene;
-}
-
-// The objects come from : https://www.turbosquid.com/FullPreview/Index.cfm/ID/1498368
-// Edited with blender
-Scene *initScene6()
-{
-  Scene *scene = initScene();
-  setCamera(scene, point3(0, 3, 10), vec3(0, 1, 0), vec3(0, 3, 0), 60,
-            float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
-  setSkyColor(scene, color3(0.2, 0.2, 0.7));
-
-  addLight(scene, initLight(point3(10, 6, 10), .5f * color3(5, 5, 5)));
-  addLight(scene, initLight(point3(-10, 15, 10), .5f * color3(5, 5, 5)));
-
-  ObjLoader loader;
-  loader.load("scene6.obj");
-  const std::vector<Object *> &objs = loader.getObjects();
-  printf("%ld triangles loaded, adding them to the scene..\n", objs.size());
-  for (Object *obj : objs)
-  {
-    addObject(scene, obj);
-  }
-
-  if (SceneParameters::focalDistance == -1.f)
-  {
-    SceneParameters::focalDistance = 3.5f;
-  }
-
-  return scene;
-}
-
-Scene *initScene7()
-{
-  Scene *scene = initScene();
-  setCamera(scene, point3(4, 4, 29), vec3(10, 0, -120), vec3(0, 3, 0), 60,
-            float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
-  setSkyColor(scene, color3(0xc0 / 255.f, 0x39 / 255.f, 0x2b / 255.f));
-
-  // addLight(scene, initLight(point3(2.8, -28.34, 4.33), .5f * color3(0xc0/255.f, 0x39 / 255.f, 0x2b / 255.f)));
-  addLight(scene, initLight(point3(-10, 15, 10), .06f * color3(0xc0, 0x39, 0x2b)));
-
-  ObjLoader loader;
-  loader.load("scene7.obj");
-  const std::vector<Object *> &objs = loader.getObjects();
-  printf("%ld triangles loaded, adding them to the scene..\n", objs.size());
-  for (Object *obj : objs)
-  {
-    addObject(scene, obj);
-  }
-
-  if (SceneParameters::focalDistance == -1.f)
-  {
-    SceneParameters::focalDistance = 5.f;
-    SceneParameters::focalRange = 5.f;
-  }
-
-  return scene;
-}
-
-
-Scene *initLinkScene()
-{
-  Scene *scene = initScene();
-  setCamera(scene, point3(3.9,4,4), vec3(0,1,0), vec3(0,3,0), 60,
-    float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
-  setSkyColor(scene, color3(0.2, 0.2, 0.7));
-
-  addLight(scene, initLight(point3(2.9,2.9,2.9), .5f * color3(5, 5, 5)));
-  addLight(scene, initLight(point3(-3,4, 5), .5f * color3(5, 5, 5)));
-
-
-  Material mat = {1.1481, 0.0625, {0.016, 0.073, 0.04}, {1.0, 1.056, 1.146}};
-  mat.diffuseColor = color3(0.301, 0.034, 0.039);
-  mat.specularColor = color3(1.0, 0.992, 0.98);
-  mat.IOR = 20;
-  mat.roughness = 0.0886;
-
-  addObject(scene, initPlane(vec3(0,1,0), -0.05f, mat));
-
-  ObjLoader loader;
-  loader.load("diamondblock.obj");
-  const std::vector<Object*> &objs = loader.getObjects();
-  printf("%ld triangles loaded, adding them to the scene..\n", objs.size());
-  for (Object *obj : objs)
-  {
-    addObject(scene, obj);
-  }
-
-  if (SceneParameters::focalDistance == -1.f)
-  {
-    SceneParameters::focalDistance = 5.f;
-    SceneParameters::focalRange = 5.f;
-  }
-
-  return scene;
-}
-
-
-
-Scene *initScene9()
-{
-
-  Scene *scene = initScene();
-  setCamera(scene, point3(3, 3, 0), vec3(0, 0, 0), vec3(0, 1, 0), 60,
-            float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
-  setSkyColor(scene, color3(0.2, 0.2, 0.7));
-
-  addLight(scene, initLight(point3(2.8, -28.34, 4.33), .5f * color3(0xc0/255.f, 0x39 / 255.f, 0x2b / 255.f)));
-  addLight(scene, initLight(point3(3, 3, 3), .5f * color3(5, 5, 5)));
-
-  Material mat = {1.0771, 0.0589, {0.26, 0.036, 0.014}, {1.0, 0.852, 1.172}};
-  addObject(scene, initCone(point3(0,1,0), vec3(0, 0.5f, 0), 10.f, mat));
-  // mat.diffuseColor = color3(0.014, 0.012, 0.012);
-  // mat.specularColor = color3(0.7, 0.882, 0.786);
-  // mat.IOR = 3;
-  // mat.roughness = 0.00181;
-  addObject(scene, initPlane(vec3(0,1,0), 0, mat));
-  // addObject(scene, initSphere(vec3(2, 0.5, 0), 1, mat));
-
-  return scene;
-}
-
 
 vec3 getVector(SplittableString& a)
 {
@@ -558,6 +406,27 @@ void parseArguments(int argc, char** argv)
 #include "omp.h"
 
 
+void displaySceneConfiguration()
+{
+  printf( "\n-------------------------------------------\n"
+          "Parameters of the scene :\n"
+          "Width      : %ld\n"
+          "Height     : %ld\n"
+          "AA         : %d\n"
+          "AA mode    : %s\n"
+          "F distance : %f\n"
+          "F range    : %f\n"
+          "-------------------------------------------\n\n",
+          SceneParameters::imageWidth,
+          SceneParameters::imageHeight,
+          SceneParameters::antiAliasing,
+          SceneParameters::AAMode.c_str(),
+          SceneParameters::focalDistance,
+          SceneParameters::focalRange
+  );
+}
+
+
 int main(int argc, char *argv[])
 {
   logc(LIGHT_GREEN, stdout, "Welcome to the L3 IGTAI RayTracer project\n");
@@ -595,43 +464,14 @@ int main(int argc, char *argv[])
   case 4:
     scene = initScene4();
     break;
-  case 5:
-    scene = initScene5();
-    break;
-  case 6:
-    scene = initScene6();
-    break;
-  case 7:
-    scene = initScene7();
-    break;
-  case 8:
-    scene = initLinkScene();
-    break;
-  case 9:
-    scene = initScene9();
-    break;
 
   default:
     scene = initScene0();
     break;
   }
 
-  printf( "\n-------------------------------------------\n"
-          "Parameters of the scene :\n"
-          "Width      : %ld\n"
-          "Height     : %ld\n"
-          "AA         : %d\n"
-          "AA mode    : %s\n"
-          "F distance : %f\n"
-          "F range    : %f\n"
-          "-------------------------------------------\n\n",
-          SceneParameters::imageWidth,
-          SceneParameters::imageHeight,
-          SceneParameters::antiAliasing,
-          SceneParameters::AAMode.c_str(),
-          SceneParameters::focalDistance,
-          SceneParameters::focalRange
-  );
+  displaySceneConfiguration();
+
 
   printf("render scene %d\n", scene_id);
 
