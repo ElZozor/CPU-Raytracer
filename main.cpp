@@ -392,7 +392,7 @@ Scene *initScene7()
 Scene *initLinkScene()
 {
   Scene *scene = initScene();
-  setCamera(scene, point3(3.9,4,4), vec3(0,1,0), vec3(0,3,0), 60, 
+  setCamera(scene, point3(3.9,4,4), vec3(0,1,0), vec3(0,3,0), 60,
     float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
   setSkyColor(scene, color3(0.2, 0.2, 0.7));
 
@@ -430,7 +430,7 @@ Scene *initLinkScene()
 
 Scene *initScene9()
 {
-  
+
   Scene *scene = initScene();
   setCamera(scene, point3(3, 3, 0), vec3(0, 0, 0), vec3(0, 1, 0), 60,
             float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
@@ -463,67 +463,6 @@ vec3 getVector(SplittableString& a)
 
   return v;
 }
-
-// Scene* initCustomScene(const std::string& filename)
-// {
-//   std::ifstream file(filename);
-//   if (!file.is_open())
-//   {
-//     logc(LIGHT_RED, stderr, "Invalid file: %s", filename.c_str());
-//     exit(2);
-//   }
-
-//   Scene* scene = initScene();
-//   SplittableString str;
-//   while (std::getline(file, str))
-//   {
-//     std::vector<SplittableString> ops = str.split(" ");
-
-//     if (ops.size() < 2 || ops[0] == "#")
-//     {
-//       continue;
-//     }
-
-//     const SplittableString& id = ops[0];
-//     if (id == "camera")
-//     {
-//       if (ops.size() < 5)
-//       {
-//         logc(LIGHT_RED, stderr, "camera, missing parameters");
-//         exit(1);
-//       }
-
-//       point3 position = getVector(ops[1]); 
-//       point3 at = getVector(ops[2]);
-//       point3 up = getVector(ops[3]);
-//       int fov = std::stoi(ops[4].c_str());
-      
-//       setCamera(scene, position, at, up, fov,
-//             float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
-//     }
-//     else if (id == "skycolor")
-//     {
-//       if (ops.size() < 3)
-//       {
-//         logc(LIGHT_RED, stderr, "ligth, missing parameter");
-//         exit(2);
-//       }
-
-//       color3 position = getVector(ops[1]);
-//       color3 color    = getVector(ops[2]);
-
-//       addLight(scene, initLight(position, color));
-//     }
-//     else if (id == "object")
-//     {
-
-//     }
-//   }
-
-//   file.close();
-//   return scene;
-// }
-
 
 
 void displayHelp(char** argv)
@@ -612,7 +551,7 @@ void parseArguments(int argc, char** argv)
       logc(LIGHT_RED, stdout, "Type 'help' to display the help message\n");
       exit(1);
     }
-    
+
   }
 }
 
