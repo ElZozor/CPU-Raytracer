@@ -8,18 +8,31 @@
 #include <tuple>
 
 
+inline color3 getColorFromUV(const Material* mat, const vec2& uv) {
+    assert(mat->image != nullptr);
+    const auto& image = mat->image;
+    const auto& height = mat->height;
+    const auto& width  = mat->width;
+
+    const auto uvmod = clamp(uv, 0.0f, 1.0f);
+    const auto y = (int((height-1)* uvmod.y+0.5f)) % height;
+    const auto x = (int((width-1) * uvmod.x+0.5f)) % width;
+
+    return image[y * width + x];
+}
+
 
 inline bool intersectTriangle(Ray *ray, Intersection *intersection, Object *obj)
 {
-    const float EPSILON = 0.0000001f;
+    const float EPSILON = 1e-7f;
     const auto &triangle = obj->geom.triangle;
     const auto [v0, v1, v2] = triangle.v;
 
-    const vec3 edge1 = v1 - v0;
+    const vec3 edge0 = v1 - v0;
     const vec3 edge2 = v2 - v0;
     const vec3 h = cross(ray->dir, edge2);
 
-    const float a = dot(edge1, h);
+    const float a = dot(edge0, h);
 
     if (a > -EPSILON && a < EPSILON)
     {
@@ -34,7 +47,7 @@ inline bool intersectTriangle(Ray *ray, Intersection *intersection, Object *obj)
         return false;
     }
 
-    const vec3 q = cross(s, edge1);
+    const vec3 q = cross(s, edge0);
     const float v = f * dot(ray->dir, q);
     if (v < 0.0 || u + v > 1.0)
     {
@@ -48,15 +61,34 @@ inline bool intersectTriangle(Ray *ray, Intersection *intersection, Object *obj)
         return false;
     }
 
-    const vec3 N = normalize(cross(edge1, edge2));
+    const vec3 N = normalize(cross(edge0, edge2));
 
     intersection->position = ray->orig + ray->dir * t;
     intersection->normal = N;
     intersection->mat = &obj->mat;
-
     ray->tmax = t;
+
+    const auto& [width, height] = std::make_tuple(obj->mat.width, obj->mat.height);
+    intersection->textured = (width * height != 0);
+
+    
+    if (intersection->textured)
+    {
+        const auto& [t0, t1, t2] = triangle.vt;
+        const float w = 1.f - u - v;
+        const auto uv = (t0*w + t1*u + t2*v)/(u + v + w);
+        
+        intersection->vt = uv;
+    }
+
+
     return true;
 }
+
+
+
+
+
 
 
 

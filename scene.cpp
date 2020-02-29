@@ -34,10 +34,6 @@ Object *initTriangle(point3 v[3], vec3 vt[3], vec3 vn[3], Material mat) {
     memcpy(ret->geom.triangle.vn, vn, sizeof(vec3)   * 3);
     memcpy(&(ret->mat), &mat, sizeof(Material));
 
-    assert(v[0].x == ret->geom.triangle.v[0].x);
-    printf("%f %f %f \n",v[0].x, v[1].x, v[2].x);
-    // printf("%f %f %f \n",ret->geom.triangle.v[0], ret->geom.triangle.v[1], ret->geom.triangle.v[2]);
-
     return ret;
 }
 

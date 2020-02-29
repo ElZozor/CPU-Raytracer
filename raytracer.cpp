@@ -139,11 +139,12 @@ color3 RDM_bsdf_s(float LdotH, float NdotH, float VdotH, float LdotN,
     return ks * ((D*F*G) / (4.f * LdotN * VdotN));
 }
 
-// diffuse term of the cook torrance bsdf
-color3 RDM_bsdf_d(Material *m)
-{
-    return m->diffuseColor / M_PIf32;
-}
+// // diffuse term of the cook torrance bsdf
+// color3 RDM_bsdf_d(Material *m)
+// {
+//     return m->diffuseColor / M_PIf32;
+// }
+
 
 // The full evaluation of bsdf(wi, wo) * cos (thetai)
 // LdotH : Light . Half
@@ -152,22 +153,38 @@ color3 RDM_bsdf_d(Material *m)
 // LdotN : Light . Norm
 // VdtoN : View . Norm
 // compute bsdf * cos(Oi)
+// color3 RDM_bsdf(float LdotH, float NdotH, float VdotH, float LdotN,
+//                                 float VdotN, Material *m)
+// {
+//     const auto rightTerm = RDM_bsdf_s(LdotH, NdotH, VdotH, LdotN, VdotN, m);
+//     const auto leftTerm = RDM_bsdf_d(m);
+
+//     return (leftTerm + rightTerm);
+// }
+
+
+// diffuse term of the cook torrance bsdf
+color3 RDM_bsdf_d(const color3& c)
+{
+    return c / M_PIf32;
+}
+
 color3 RDM_bsdf(float LdotH, float NdotH, float VdotH, float LdotN,
-                                float VdotN, Material *m)
+                                float VdotN, Material* m, const color3& color)
 {
     const auto rightTerm = RDM_bsdf_s(LdotH, NdotH, VdotH, LdotN, VdotN, m);
-    const auto leftTerm = RDM_bsdf_d(m);
+    const auto leftTerm = RDM_bsdf_d(color);
 
     return (leftTerm + rightTerm);
 }
 
-color3 shade(vec3 n, vec3 v, vec3 l, color3 lc, Material *mat)
+color3 shade(vec3 n, vec3 v, vec3 l, color3 lc, Material *mat, const color3& color)
 {
     const auto h = normalize(v+l);
     const auto LdotH = dot(l, h), NdotH = dot(n, h),
         VdotH = dot(v, h), LdotN = dot(l, n), VdotN = dot(v, n);
     
-    color3 ret = lc * RDM_bsdf(LdotH, NdotH, VdotH, LdotN, VdotN, mat) * LdotN;
+    color3 ret = lc * RDM_bsdf(LdotH, NdotH, VdotH, LdotN, VdotN, mat, color) * LdotN;
     return clamp(ret, vec3(0.f), vec3(1.f));
 }
 
@@ -202,7 +219,9 @@ color3 trace_ray(Scene *scene, Ray *ray, KdTree *tree)
 
         if (!intersectObjectKdTree(scene, tree, &shadowRay, &shadowIntersection))
         {
-            color += shade(intersection.normal, -ray->dir, l, light->color, intersection.mat);
+            const color3& c = (intersection.textured ? getColorFromUV(intersection.mat, intersection.vt) : intersection.mat->diffuseColor);
+            // const color3 c(intersection.vt.x, 0, intersection.vt.y);
+            color += shade(intersection.normal, -ray->dir, l, light->color, intersection.mat, c);
         }
     }
 

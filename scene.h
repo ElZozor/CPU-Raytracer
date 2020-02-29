@@ -2,6 +2,7 @@
 #define __SCENE_H__
 
 #include "defines.h"
+#include <vector>
 
 // SCENE
 typedef struct scene_s Scene;
@@ -14,6 +15,10 @@ typedef struct material_s {
   float roughness; //! 0.001 - 0.01 : very smooth finish with slight imperfections. 0.1 : relatively rough. 0.3-0.7 extremely rough 
   color3 specularColor;	//! Specular "albedo"
   color3 diffuseColor;	//! Base color
+
+  color3* image = nullptr;
+  size_t width = 0;
+  size_t height = 0;
 } Material;
 
 enum Etype {SPHERE=1, PLANE, TRIANGLE, CONE};

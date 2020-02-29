@@ -27,6 +27,8 @@ typedef struct intersection_s {
   vec3 normal; //! the normal of the intersection point
   point3 position; //! the intersection point
   Material *mat; //! the material of th intersected object
+  vec2 vt;
+  bool textured = false;
 } Intersection;
 
 

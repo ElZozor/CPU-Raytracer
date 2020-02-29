@@ -5,6 +5,8 @@
 #include "SplittableString.hpp"
 #include "color_msg.h"
 
+#include "lodepng-master/lodepng_util.h"
+
 ObjLoader::ObjLoader()
 {
 
@@ -69,9 +71,15 @@ void ObjLoader::load(const std::string& filename)
         else if (id == "vt")
         {
             vec3 vti(0);
-            for (size_t i = 1; i < values.size() && i < 4; ++i)
+            size_t i;
+            for (i = 1; i < values.size() && i < 4; ++i)
             {
                 vti[i-1] = std::stof(values[i]);
+            }
+            
+            for (size_t j = i; j < 4; ++j)
+            {
+                vti[j-1] = 1.f - vti[i-2];
             }
 
             vt.push_back(vti);
@@ -147,6 +155,40 @@ void ObjLoader::load(const std::string& filename)
 }
 
 
+
+static color3* loadPNGFile(const std::string& filename, uint* width, uint* height) {
+    unsigned char *v;
+    unsigned int error = lodepng_decode_file(&v, width, height, filename.c_str(), LCT_RGB, 24);
+
+    if(error) 
+    {
+        std::cerr << "Unable to load texture file: " << filename << std::endl;
+        return nullptr;
+    }
+
+    const auto size = (*width)*(*height);
+    color3* img = new color3[size];
+
+    // ~50x faster than division on each pixel
+    const float divider = 1.f / float((unsigned short) - 1);
+    
+    size_t it = 0;
+    const unsigned short* ptr = (const unsigned short*)(v);
+    for (size_t i = 0; i < size; ++i) 
+    {
+        img[i][0] = ptr[it+0] * divider;
+        img[i][1] = ptr[it+1] * divider;
+        img[i][2] = ptr[it+2] * divider;
+
+        it += 3;
+    }
+
+    free(v);
+
+    return img;
+}
+
+
 void ObjLoader::loadMaterialFile(const std::string& filename)
 {
     std::ifstream file(filename);
@@ -175,6 +217,7 @@ void ObjLoader::loadMaterialFile(const std::string& filename)
                 mMaterials[materialName] = mat;
             }
             
+            memset(&mat, 0, sizeof(Material));
             iss >> materialName;
             constructingMaterial = true;
         } 
@@ -201,6 +244,29 @@ void ObjLoader::loadMaterialFile(const std::string& filename)
             float r;
             iss >> r;
             mat.IOR = r;
+        }
+        else if (id == "map_Kd")
+        {
+            std::string filename;
+            unsigned int width, height, error;
+
+            iss >> filename;
+            color3* pixels = loadPNGFile(filename, &width, &height);
+            
+
+            if (pixels == nullptr)
+            {
+                std::cerr << "Unable to load texture file: "  << filename << std::endl;
+                std::cerr << "Error code: "  << error << std::endl;
+            }
+            else
+            {
+                mat.image  = pixels;
+                mat.width  = width;
+                mat.height = height;
+
+                std::cout << "Texture successfully loaded from: " << filename << std::endl;
+            }
         }
     }
 

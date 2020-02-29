@@ -392,22 +392,24 @@ Scene *initScene7()
 Scene *initLinkScene()
 {
   Scene *scene = initScene();
-  setCamera(scene, point3(1.5,1,1.5), vec3(0,0,0), vec3(0,3,0), 60, float(WIDTH) / float(HEIGHT));
+  setCamera(scene, point3(3.9,4,4), vec3(0,1,0), vec3(0,3,0), 60, 
+    float(SceneParameters::imageWidth) / float(SceneParameters::imageHeight));
   setSkyColor(scene, color3(0.2, 0.2, 0.7));
 
-  addLight(scene, initLight(point3(0,10,5), .5f * color3(5, 5, 5)));
-  addLight(scene, initLight(point3(3,2,5), .5f * color3(5, 5, 5)));
+  addLight(scene, initLight(point3(2.9,2.9,2.9), .5f * color3(5, 5, 5)));
+  addLight(scene, initLight(point3(-3,4, 5), .5f * color3(5, 5, 5)));
 
 
   Material mat = {1.1481, 0.0625, {0.016, 0.073, 0.04}, {1.0, 1.056, 1.146}};
-//  mat.diffuseColor = color3(0.301, 0.034, 0.039);
-//  mat.specularColor = color3(1.0, 0.992, 0.98);
-//  mat.IOR = 1.1382;
-//  mat.roughness = 0.0886;
-  addObject(scene, initPlane(vec3(0,-1,0), -.5f, mat));
+  mat.diffuseColor = color3(0.301, 0.034, 0.039);
+  mat.specularColor = color3(1.0, 0.992, 0.98);
+  mat.IOR = 20;
+  mat.roughness = 0.0886;
+
+  addObject(scene, initPlane(vec3(0,1,0), -0.05f, mat));
 
   ObjLoader loader;
-  loader.load("link.obj");
+  loader.load("diamondblock.obj");
   const std::vector<Object*> &objs = loader.getObjects();
   printf("%ld triangles loaded, adding them to the scene..\n", objs.size());
   for (Object *obj : objs)
@@ -444,7 +446,7 @@ Scene *initScene9()
   // mat.IOR = 3;
   // mat.roughness = 0.00181;
   addObject(scene, initPlane(vec3(0,1,0), 0, mat));
-  addObject(scene, initSphere(vec3(2, 0.5, 0), 1, mat));
+  // addObject(scene, initSphere(vec3(2, 0.5, 0), 1, mat));
 
   return scene;
 }
