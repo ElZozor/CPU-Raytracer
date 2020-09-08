@@ -22,12 +22,12 @@ This can be done with the `-scenenumber` parameter. The default value is 0.
 ### Options
 
 Some options are available.  
- - width: Integer -> It sets the resulting iamge width.
- - height: Integer -> It sets the resulting image height.
- - aa: Integer -> The amount of Anti-aliasing for the render.
- - aamode: String ('none' | 'luma' | 'sobel') -> Which optimisation you want to apply to the anti-aliasing (see bellow).
- - focaldist: Float -> The focal distance for the render.
- - focalrange: Float -> The range within the render will be sharp.
+ - `width`: `Integer` -> It sets the resulting iamge width.
+ - `height`: `Integer` -> It sets the resulting image height.
+ - `aa`: `Integer` -> The amount of Anti-aliasing for the render.
+ - `aamode`: `String` (`none` | `luma` | `sobel`) -> Which optimisation you want to apply to the anti-aliasing (see bellow).
+ - `focaldist`: `Float` -> The focal distance for the render.
+ - `focalrange`: `Float` -> The range within the render will be sharp.
 
 #### AA optimizations  
 This parameter can be sets to one of the following values : none, luma, sobel.  
