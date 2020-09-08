@@ -30,5 +30,5 @@ This parameter can be sets to one of the following values : none, luma, sobel.
  
 ## Some renders
 
-<img src=""/>
-<img src=""/>
+<img src="https://raw.githubusercontent.com/ElZozor/CPU-Raytracer/master/previews/paysage.png"/>
+<img src="https://raw.githubusercontent.com/ElZozor/CPU-Raytracer/master/previews/cube_minecraft.png"/>
