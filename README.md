@@ -5,6 +5,13 @@ The code is in C/C++.
 
 ## Usage
 
+### Build
+
+Just launch a terminal in the root directory and run the `make` command.  
+Once done you can use the program with `./mrt [options]`.
+
+### Needed
+
 Two parameters are needed to run the program.  
 First you need to provide an output file in which the render will be saved.  
 This can be done with the `-filename` option.
